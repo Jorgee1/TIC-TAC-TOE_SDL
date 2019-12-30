@@ -136,44 +136,6 @@ void Check_C(int puntaje[2],int *turno){
 void SDL_Teclado(int *turno, Action* action ){
 
 
-    if(action->check_action(action->BUTTON_MOVE_UP)){
-        Pantalla_C[y_c][x_c] = 0;
-        y_c = y_c - 1;
-        if(y_c<0){
-            y_c = 2;
-        }
-        Pantalla_C[y_c][x_c] = 1;
-    }else if(action->check_action(action->BUTTON_MOVE_DOWN)){
-        Pantalla_C[y_c][x_c] = 0;
-        y_c = y_c + 1;
-        if(y_c>2){
-            y_c = 0;
-        }
-        Pantalla_C[y_c][x_c] = 1;
-    }else if(action->check_action(action->BUTTON_MOVE_LEFT)){
-        Pantalla_C[y_c][x_c] = 0;
-        x_c = x_c - 1;
-        if(x_c<0){
-            x_c = 2;
-        }
-        Pantalla_C[y_c][x_c] = 1;
-    }else if(action->check_action(action->BUTTON_MOVE_RIGHT)){
-        Pantalla_C[y_c][x_c] = 0;
-        x_c = x_c + 1;
-        if(x_c>2){
-            x_c = 0;
-        }
-        Pantalla_C[y_c][x_c] = 1;
-    }else if(action->check_action(action->BUTTON_ACTION)){
-        if(( Mark_Tags[y_c][x_c] != 1 ) && ( Mark_Tags[y_c][x_c] != 2 ) ){
-            if(*turno == 1){
-                Mark_Tags[y_c][x_c]  = 1;
-            }else if(*turno == -1){
-                Mark_Tags[y_c][x_c]  = 2;
-            }
-            *turno = (*turno)*-1;
-        }
-    }
    
 }
 
@@ -235,31 +197,13 @@ void Impresor_Pantalla(TextureText* text, Window* window, int turno,int puntaje[
         x_p = 5;
         y_p = y_p +(Viewport.h/3);
     }
-    SDL_SetRenderDrawColor(text->renderer,0,0,0,0xFF);
+    SDL_SetRenderDrawColor(text->renderer,0xFF,0xFF,0xFF,0xFF);
     SDL_RenderDrawLine(text->renderer,Viewport.w/3,0,Viewport.w/3,Viewport.h);
     SDL_RenderDrawLine(text->renderer,2*(Viewport.w/3),0,2*(Viewport.w/3),Viewport.h);
     SDL_RenderDrawLine(text->renderer,0,Viewport.h/3,Viewport.w,Viewport.h/3);
     SDL_RenderDrawLine(text->renderer,0,2*(Viewport.h/3),Viewport.w,2*(Viewport.h/3));
 }
 
-void Impresor_Consola(){
-    system("cls");
-    for (int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-            printf("%i", Pantalla_C[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    for (int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-            printf("%i", Mark_Tags[i][j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-    printf("%i %i\n", x_c, y_c);
-}
 
 int main( int argc, char* args[] ){
     int SCREEN_WIDTH  = 640;
@@ -268,7 +212,7 @@ int main( int argc, char* args[] ){
 
     std::string PATH_FONT = "asset/font/LiberationMono-Regular.ttf";
     std::string PATH_ICON = "asset/icon.bmp";
-    
+
     bool exit = false;
     int Turno = 1;
     int Puntaje[2]={0,0};
@@ -303,13 +247,48 @@ int main( int argc, char* args[] ){
         }else{
             window.clear_screen();
             SDL_Teclado(&Turno, action);
-
+            if(action->check_action(action->BUTTON_MOVE_UP)){
+                Pantalla_C[y_c][x_c] = 0;
+                y_c = y_c - 1;
+                if(y_c<0){
+                    y_c = 2;
+                }
+                Pantalla_C[y_c][x_c] = 1;
+            }else if(action->check_action(action->BUTTON_MOVE_DOWN)){
+                Pantalla_C[y_c][x_c] = 0;
+                y_c = y_c + 1;
+                if(y_c>2){
+                    y_c = 0;
+                }
+                Pantalla_C[y_c][x_c] = 1;
+            }else if(action->check_action(action->BUTTON_MOVE_LEFT)){
+                Pantalla_C[y_c][x_c] = 0;
+                x_c = x_c - 1;
+                if(x_c<0){
+                    x_c = 2;
+                }
+                Pantalla_C[y_c][x_c] = 1;
+            }else if(action->check_action(action->BUTTON_MOVE_RIGHT)){
+                Pantalla_C[y_c][x_c] = 0;
+                x_c = x_c + 1;
+                if(x_c>2){
+                    x_c = 0;
+                }
+                Pantalla_C[y_c][x_c] = 1;
+            }else if(action->check_action(action->BUTTON_ACTION)){
+                if(( Mark_Tags[y_c][x_c] != 1 ) && ( Mark_Tags[y_c][x_c] != 2 ) ){
+                    if(Turno == 1){
+                        Mark_Tags[y_c][x_c]  = 1;
+                    }else if(Turno == -1){
+                        Mark_Tags[y_c][x_c]  = 2;
+                    }
+                    Turno= Turno*-1;
+                }
+            }
 
             Impresor_Pantalla(&text_white, &window, Turno, Puntaje);
-            Impresor_Consola();
+
             Check_C(Puntaje,&Turno);
-
-
             window.update_screen();
         }
     }
