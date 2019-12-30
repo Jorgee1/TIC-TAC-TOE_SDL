@@ -267,7 +267,8 @@ int main( int argc, char* args[] ){
     int FONT_SIZE = 20;
 
     std::string PATH_FONT = "asset/font/LiberationMono-Regular.ttf";
-
+    std::string PATH_ICON = "asset/icon.bmp";
+    
     bool exit = false;
     int Turno = 1;
     int Puntaje[2]={0,0};
@@ -281,6 +282,7 @@ int main( int argc, char* args[] ){
     SDL_Color COLOR_WHITE = {0xFF, 0xFF, 0xFF, 0xFF};
 
     Window window("TIC-TAC-TOE", SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BLACK);
+    window.set_icon(PATH_ICON);
 
     TextureText text_white(window.get_render(), PATH_FONT, COLOR_WHITE, FONT_SIZE);
 
