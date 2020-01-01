@@ -112,12 +112,7 @@ int main( int argc, char* args[] ){
     int FONT_SIZE = 20;
 
     int turno = 1;
-    int pantalla_c[3][3] = {
-        {0, 0, 0},
-        {0, 0, 0},
-        {0, 0, 0}
-    };
-    int mark_tags [3][3] = {
+    int mark_tags[3][3]  = {
         {0, 0, 0},
         {0, 0, 0},
         {0, 0, 0}
@@ -128,43 +123,44 @@ int main( int argc, char* args[] ){
 
     std::string PATH_FONT = "asset/font/LiberationMono-Regular.ttf";
     std::string PATH_ICON = "asset/icon.bmp";
+    std::string GAME_NAME = "TIC-TAC-TOE";
 
     std::string PLAYER1 = "Jugador 1";
     std::string PLAYER2 = "Jugador 2";
 
     SDL_Point cursor = {1, 1};
-    pantalla_c[cursor.x][cursor.y] = 1;
     
     SDL_Color COLOR_BLACK = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color COLOR_RED   = {0xFF, 0x00, 0x00, 0xFF};
     SDL_Color COLOR_GREEN = {0x00, 0xFF, 0x00, 0xFF};
     SDL_Color COLOR_BLUE  = {0x00, 0x00, 0xFF, 0xFF};
     SDL_Color COLOR_WHITE = {0xFF, 0xFF, 0xFF, 0xFF};
+
     SDL_Color COLOR_P1    = {  73,  221,  238, 0xFF};
     SDL_Color COLOR_P2    = {  12,  100,  100, 0xFF};
 
-    SDL_Rect Viewport1 = {
+    SDL_Rect stat_screen = {
         0, 
         0,
         SCREEN_WIDTH,
         80
     };
 
-    SDL_Rect Viewport = {
+    SDL_Rect game_board = {
         45, 
         80,
         SCREEN_WIDTH  - 90,
         SCREEN_HEIGHT - 90
     };
 
-    SDL_Rect rect = {
+    SDL_Rect board_mark = {
         5,
         5,
-        (Viewport.w/3) - 10,
-        (Viewport.h/3) - 10
+        (game_board.w/3) - 10,
+        (game_board.h/3) - 10
     };
 
-    Window window("TIC-TAC-TOE", SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BLACK);
+    Window window(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BLACK);
     window.set_icon(PATH_ICON);
 
     TextureText text_white(window.get_render(), PATH_FONT, COLOR_WHITE, FONT_SIZE);
@@ -186,34 +182,27 @@ int main( int argc, char* args[] ){
         }else{
             window.clear_screen();
 
+            // PLayer action
             if(action->check_action(action->BUTTON_MOVE_UP)){
-                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.y = cursor.y - 1;
                 if(cursor.y<0){
                     cursor.y = 2;
                 }
-                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_MOVE_DOWN)){
-                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.y = cursor.y + 1;
                 if(cursor.y>2){
                     cursor.y = 0;
                 }
-                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_MOVE_LEFT)){
-                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.x = cursor.x - 1;
                 if(cursor.x<0){
                     cursor.x = 2;
                 }
-                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_MOVE_RIGHT)){
-                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.x = cursor.x + 1;
                 if(cursor.x>2){
                     cursor.x = 0;
                 }
-                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_ACTION)){
                 if(( mark_tags[cursor.y][cursor.x] != 1 ) && ( mark_tags[cursor.y][cursor.x] != 2 ) ){
                     if(turno == 1){
@@ -229,89 +218,82 @@ int main( int argc, char* args[] ){
 
             // Draw
 
-            window.set_viewport(&Viewport1);
+            window.set_viewport(&stat_screen);
 
             text_white.render(0, 0, PLAYER1);
             text_white.render(
-                Viewport1.w-text_white.get_text_size(PLAYER1).w, 0, 
+                stat_screen.w-text_white.get_text_size(PLAYER1).w, 0, 
                 PLAYER2
             );
 
             text_white.render(
-                (Viewport1.w/2) - text_white.get_text_size(PLAYER2).w - 5, 0,
+                (stat_screen.w/2) - text_white.get_text_size(PLAYER2).w - 5, 0,
                 std::to_string(puntaje[0])
             );
             text_white.render(
-                (Viewport1.w/2) - text_white.get_text_size(std::to_string(puntaje[0])).w - 5, 0,
+                (stat_screen.w/2) - text_white.get_text_size(std::to_string(puntaje[0])).w - 5, 0,
                 std::to_string(puntaje[1])
             );
 
 
-            window.set_viewport(&Viewport);
+            window.set_viewport(&game_board);
 
-            rect.x = 5;
-            rect.y = 5;
+            board_mark.y = 5;
             for(int i=0;i<3;i++){
+                board_mark.x = 5;
                 for(int j=0;j<3;j++){
                     if(mark_tags[i][j] == 1){
-                        window.draw_rectangle(rect, {73,221,238,0xFF});
+                        window.draw_rectangle(board_mark, COLOR_P1);
                     }
                     if(mark_tags[i][j] == 2){
-                        window.draw_rectangle(rect, {12,100,100,0xFF});
+                        window.draw_rectangle(board_mark, COLOR_P2);
                     }
-                    if(pantalla_c[i][j] == 1){
-                        window.draw_rectangle(rect, COLOR_WHITE);
+                    if((cursor.x==j) && (cursor.y==i)){
+                        window.draw_rectangle(board_mark, COLOR_WHITE);
                     }
-                    rect.x = rect.x + (Viewport.w/3);
+                    board_mark.x = board_mark.x + (game_board.w/3);
                 }
-                rect.x = 5;
-                rect.y = rect.y + (Viewport.h/3);
+                board_mark.y = board_mark.y + (game_board.h/3);
             }
 
 
 
             window.draw_line(
-                {Viewport.w/3,          0},
-                {Viewport.w/3, Viewport.h},
+                {game_board.w/3,            0},
+                {game_board.w/3, game_board.h},
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {2*(Viewport.w/3),          0},
-                {2*(Viewport.w/3), Viewport.h},
+                {2*(game_board.w/3),            0},
+                {2*(game_board.w/3), game_board.h},
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {0,          Viewport.h/3},
-                {Viewport.w, Viewport.h/3},
+                {0,            game_board.h/3},
+                {game_board.w, game_board.h/3},
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {0,          2*(Viewport.h/3)},
-                {Viewport.w, 2*(Viewport.h/3)},
+                {0,            2*(game_board.h/3)},
+                {game_board.w, 2*(game_board.h/3)},
                 COLOR_WHITE
             );
 
             window.set_viewport(nullptr);
 
 
-
+            // check state
             if(Check_C(puntaje, &turno, mark_tags)){
-                for (int i=0;i<3;i++){
-                    for(int j=0;j<3;j++){
-                        pantalla_c[i][j] = 0;
-                    }
-                }
                 for (int i=0;i<3;i++){
                     for(int j=0;j<3;j++){
                         mark_tags[i][j] = 0;
                     }
                 }
-                cursor.x=0;
-                cursor.y=0;
-                pantalla_c[cursor.y][cursor.x] = 1;
+                cursor.x = 0;
+                cursor.y = 0;
                 turno = 1;
             }
             window.update_screen();
