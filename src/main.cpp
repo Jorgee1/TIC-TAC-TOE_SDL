@@ -6,13 +6,14 @@
 #include "texture.h"
 
 
-bool Check_C(int puntaje[2], int *turno, int mark_tags[3][3]){
+bool check_board(int score[2], int *turno, int mark_tags[3][3]){
     bool Reseteo = false;
     /// triqi ? /////
-    int Triqi_h[2] = {0,0};
-    int Triqi_v[2] = {0,0};
+    int Triqi_h[2]  = {0,0};
+    int Triqi_v[2]  = {0,0};
     int Triqi_d1[2] = {0,0};
     int Triqi_d2[2] = {0,0};
+
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
            /// horizontal ///////////////
@@ -28,14 +29,14 @@ bool Check_C(int puntaje[2], int *turno, int mark_tags[3][3]){
                 Triqi_v[1]++;
            }
            /// diagonal? ///////////////
-           if(i==j){
+           if(i == j){
                 if(mark_tags[i][j] == 1){
                     Triqi_d1[0]++;
                 }else if(mark_tags[i][j] == 2){
                     Triqi_d1[1]++;
                 }
            }
-           if((i+j)==2){
+           if((i+j) == 2){
                 if(mark_tags[i][j] == 1){
                     Triqi_d2[0]++;
                 }else if(mark_tags[i][j] == 2){
@@ -43,44 +44,44 @@ bool Check_C(int puntaje[2], int *turno, int mark_tags[3][3]){
                 }
            }
         }
-        if(Triqi_h[0]==3){
+        if(Triqi_h[0] == 3){
             printf("Triqi_h 1\n");
-            puntaje[0]++;
+            score[0]++;
             Reseteo = true;
             break;
-        }else if(Triqi_h[1]==3){
+        }else if(Triqi_h[1] == 3){
             printf("Triqi_h 2\n");
-            puntaje[1]++;
+            score[1]++;
             Reseteo = true;
             break;
-        }else if(Triqi_v[0]==3){
+        }else if(Triqi_v[0] == 3){
             printf("Triqi_v 1\n");
-            puntaje[0]++;
+            score[0]++;
             Reseteo = true;
             break;
-        }else if(Triqi_v[1]==3){
+        }else if(Triqi_v[1] == 3){
             printf("Triqi_v 2\n");
-            puntaje[1]++;
+            score[1]++;
             Reseteo = true;
             break;
-        }else if(Triqi_d1[0]==3){
+        }else if(Triqi_d1[0] == 3){
             printf("Triqi_d1 1\n");
-            puntaje[0]++;
+            score[0]++;
             Reseteo = true;
             break;
-        }else if(Triqi_d1[1]==3){
+        }else if(Triqi_d1[1] == 3){
             printf("Triqi_d1 2\n");
-            puntaje[1]++;
+            score[1]++;
             Reseteo = true;
             break;
-        }else if(Triqi_d2[0]==3){
+        }else if(Triqi_d2[0] == 3){
             printf("Triqi_d2 1\n");
-            puntaje[0]++;
+            score[0]++;
             Reseteo = true;
             break;
-        }else if(Triqi_d2[1]==3){
+        }else if(Triqi_d2[1] == 3){
             printf("Triqi_d2 2\n");
-            puntaje[1]++;
+            score[1]++;
             Reseteo = true;
             break;
         }else{
@@ -100,7 +101,7 @@ bool Check_C(int puntaje[2], int *turno, int mark_tags[3][3]){
         }
     }
     if(Zeros == 0){
-        Reseteo=true;
+        Reseteo = true;
     }
 
     return Reseteo;
@@ -109,17 +110,17 @@ bool Check_C(int puntaje[2], int *turno, int mark_tags[3][3]){
 int main( int argc, char* args[] ){
     int SCREEN_WIDTH  = 640;
     int SCREEN_HEIGHT = 480;
-    int FONT_SIZE = 20;
+    int FONT_SIZE     =  20;
 
-    int turno = 1;
-    int mark_tags[3][3]  = {
+    int turn = 1;
+    bool exit = false;
+
+    int board[3][3] = {
         {0, 0, 0},
         {0, 0, 0},
         {0, 0, 0}
     };
-    int puntaje[2] = {0, 0};
-
-    bool exit = false;
+    int score[2] = {0, 0};
 
     std::string PATH_FONT = "asset/font/LiberationMono-Regular.ttf";
     std::string PATH_ICON = "asset/icon.bmp";
@@ -139,25 +140,25 @@ int main( int argc, char* args[] ){
     SDL_Color COLOR_P1    = {  73,  221,  238, 0xFF};
     SDL_Color COLOR_P2    = {  12,  100,  100, 0xFF};
 
-    SDL_Rect stat_screen = {
+    SDL_Rect view_stat = {
         0, 
         0,
         SCREEN_WIDTH,
         80
     };
 
-    SDL_Rect game_board = {
+    SDL_Rect view_board = {
         45, 
         80,
         SCREEN_WIDTH  - 90,
         SCREEN_HEIGHT - 90
     };
 
-    SDL_Rect board_mark = {
+    SDL_Rect mark = {
         5,
         5,
-        (game_board.w/3) - 10,
-        (game_board.h/3) - 10
+        (view_board.w/3) - 10,
+        (view_board.h/3) - 10
     };
 
     Window window(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BLACK);
@@ -182,103 +183,100 @@ int main( int argc, char* args[] ){
         }else{
             window.clear_screen();
 
-            // PLayer action
+            // Player actions
             if(action->check_action(action->BUTTON_MOVE_UP)){
                 cursor.y = cursor.y - 1;
-                if(cursor.y<0){
-                    cursor.y = 2;
-                }
             }else if(action->check_action(action->BUTTON_MOVE_DOWN)){
                 cursor.y = cursor.y + 1;
-                if(cursor.y>2){
-                    cursor.y = 0;
-                }
             }else if(action->check_action(action->BUTTON_MOVE_LEFT)){
                 cursor.x = cursor.x - 1;
-                if(cursor.x<0){
-                    cursor.x = 2;
-                }
             }else if(action->check_action(action->BUTTON_MOVE_RIGHT)){
                 cursor.x = cursor.x + 1;
-                if(cursor.x>2){
-                    cursor.x = 0;
-                }
             }else if(action->check_action(action->BUTTON_ACTION)){
-                if(( mark_tags[cursor.y][cursor.x] != 1 ) && ( mark_tags[cursor.y][cursor.x] != 2 ) ){
-                    if(turno == 1){
-                        mark_tags[cursor.y][cursor.x]  = 1;
-                    }else if(turno == -1){
-                        mark_tags[cursor.y][cursor.x]  = 2;
+                if(( board[cursor.y][cursor.x] != 1 ) && ( board[cursor.y][cursor.x] != 2 ) ){
+                    if(turn == 1){
+                        board[cursor.y][cursor.x]  = 1;
+                    }else if(turn == -1){
+                        board[cursor.y][cursor.x]  = 2;
                     }
-                    turno= turno*-1;
+                    turn= turn*-1;
                 }
             }
 
+            if(cursor.y<0){
+                cursor.y = 2;
+            }else if(cursor.y>2){
+                cursor.y = 0;
+            }
+
+            if(cursor.x<0){
+                cursor.x = 2;
+            }else if(cursor.x>2){
+                cursor.x = 0;
+            }
 
 
             // Draw
 
-            window.set_viewport(&stat_screen);
 
             text_white.render(0, 0, PLAYER1);
             text_white.render(
-                stat_screen.w-text_white.get_text_size(PLAYER1).w, 0, 
+                view_stat.w - text_white.get_text_size(PLAYER1).w, 0, 
                 PLAYER2
             );
 
             text_white.render(
-                (stat_screen.w/2) - text_white.get_text_size(PLAYER2).w - 5, 0,
-                std::to_string(puntaje[0])
+                (view_stat.w/2) - text_white.get_text_size(std::to_string(score[0])).w - 5, 0,
+                std::to_string(score[0])
             );
             text_white.render(
-                (stat_screen.w/2) - text_white.get_text_size(std::to_string(puntaje[0])).w - 5, 0,
-                std::to_string(puntaje[1])
+                (view_stat.w/2) + text_white.get_text_size(std::to_string(score[1])).w - 5, 0,
+                std::to_string(score[1])
             );
 
 
-            window.set_viewport(&game_board);
 
-            board_mark.y = 5;
+            mark.y = 5;
             for(int i=0;i<3;i++){
-                board_mark.x = 5;
+                mark.x = 5;
                 for(int j=0;j<3;j++){
-                    if(mark_tags[i][j] == 1){
-                        window.draw_rectangle(board_mark, COLOR_P1);
+                    if(board[i][j] == 1){
+                        window.draw_rectangle(mark, COLOR_P1);
                     }
-                    if(mark_tags[i][j] == 2){
-                        window.draw_rectangle(board_mark, COLOR_P2);
+                    if(board[i][j] == 2){
+                        window.draw_rectangle(mark, COLOR_P2);
                     }
                     if((cursor.x==j) && (cursor.y==i)){
-                        window.draw_rectangle(board_mark, COLOR_WHITE);
+                        window.draw_rectangle(mark, COLOR_WHITE);
                     }
-                    board_mark.x = board_mark.x + (game_board.w/3);
+                    mark.x = mark.x + (view_board.w/3);
                 }
-                board_mark.y = board_mark.y + (game_board.h/3);
+                mark.y = mark.y + (view_board.h/3);
             }
 
 
 
             window.draw_line(
-                {game_board.w/3,            0},
-                {game_board.w/3, game_board.h},
+                {view_board.w/3,            0},
+                {view_board.w/3, view_board.h},
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {2*(game_board.w/3),            0},
-                {2*(game_board.w/3), game_board.h},
+                {2*(view_board.w/3),            0},
+                {2*(view_board.w/3), view_board.h},
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {0,            game_board.h/3},
-                {game_board.w, game_board.h/3},
+                {0,            view_board.h/3},
+                {view_board.w, view_board.h/3},
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {0,            2*(game_board.h/3)},
-                {game_board.w, 2*(game_board.h/3)},
+                {0,            2*(view_board.h/3)},
+                {view_board.w, 2*(view_board.h/3)},
                 COLOR_WHITE
             );
 
@@ -286,35 +284,18 @@ int main( int argc, char* args[] ){
 
 
             // check state
-            if(Check_C(puntaje, &turno, mark_tags)){
+            if(check_board(score, &turn, board)){
                 for (int i=0;i<3;i++){
                     for(int j=0;j<3;j++){
-                        mark_tags[i][j] = 0;
+                        board[i][j] = 0;
                     }
                 }
                 cursor.x = 0;
                 cursor.y = 0;
-                turno = 1;
+                turn     = 1;
             }
             window.update_screen();
         }
     }
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
