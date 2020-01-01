@@ -9,7 +9,7 @@ INCLUDE_PATH = include
 TEST_PATH    = test
 ASSET_PATH   = asset
 
-PROGRAM_NAME = pong.app
+PROGRAM_NAME = tic-tac-toe.app
 TEST_NAME    = test.app
 
 ENTRY_FILE   = main.cpp
