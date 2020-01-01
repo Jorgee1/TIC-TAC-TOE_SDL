@@ -8,24 +8,7 @@
 #include "texture.h"
 
 
-void Reset(int* turno, SDL_Point& cursor, int Pantalla_C[3][3], int Mark_Tags[3][3]){
-    for (int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-            Pantalla_C[i][j] = 0;
-        }
-    }
-    for (int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-            Mark_Tags[i][j] = 0;
-        }
-    }
-    cursor.x=0;
-    cursor.y=0;
-    Pantalla_C[cursor.y][cursor.x] = 1;
-    *turno = 1;
-}
-
-bool Check_C(int puntaje[2], int *turno, int Mark_Tags[3][3]){
+bool Check_C(int puntaje[2], int *turno, int mark_tags[3][3]){
     bool Reseteo = false;
     /// triqi ? /////
     int Triqi_h[2] = {0,0};
@@ -35,29 +18,29 @@ bool Check_C(int puntaje[2], int *turno, int Mark_Tags[3][3]){
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
            /// horizontal ///////////////
-           if(Mark_Tags[i][j] == 1){
+           if(mark_tags[i][j] == 1){
                 Triqi_h[0]++;
-           }else if(Mark_Tags[i][j] == 2){
+           }else if(mark_tags[i][j] == 2){
                 Triqi_h[1]++;
            }
            /// vertical ///////////////
-           if(Mark_Tags[j][i] == 1){
+           if(mark_tags[j][i] == 1){
                 Triqi_v[0]++;
-           }else if(Mark_Tags[j][i] == 2){
+           }else if(mark_tags[j][i] == 2){
                 Triqi_v[1]++;
            }
            /// diagonal? ///////////////
            if(i==j){
-                if(Mark_Tags[i][j] == 1){
+                if(mark_tags[i][j] == 1){
                     Triqi_d1[0]++;
-                }else if(Mark_Tags[i][j] == 2){
+                }else if(mark_tags[i][j] == 2){
                     Triqi_d1[1]++;
                 }
            }
            if((i+j)==2){
-                if(Mark_Tags[i][j] == 1){
+                if(mark_tags[i][j] == 1){
                     Triqi_d2[0]++;
-                }else if(Mark_Tags[i][j] == 2){
+                }else if(mark_tags[i][j] == 2){
                     Triqi_d2[1]++;
                 }
            }
@@ -113,7 +96,7 @@ bool Check_C(int puntaje[2], int *turno, int Mark_Tags[3][3]){
     int Zeros = 0;
     for(int i=0;i<3;i++){
         for(int j=0;j<3;j++){
-           if(Mark_Tags[i][j] == 0){
+           if(mark_tags[i][j] == 0){
                 Zeros++;
            }
         }
@@ -125,103 +108,51 @@ bool Check_C(int puntaje[2], int *turno, int Mark_Tags[3][3]){
     return Reseteo;
 }
 
-void Impresor_Pantalla(TextureText* text, Window* window, int turno,int puntaje[2], int Mark_Tags[3][3], int Pantalla_C[3][3]){
-
-    SDL_Rect Viewport1;
-    Viewport1.h = 80;
-    Viewport1.w = window->SCREEN_WIDTH;
-    Viewport1.x = 0;
-    Viewport1.y = 0;
-    SDL_RenderSetViewport(text->renderer, &Viewport1);
-
-    text->render(0, 0, "Jugador 1");
-    text->render((Viewport1.w-text->get_text_size("Jugador 1").w), 0, "Jugador 2");
-
-    text->render(((Viewport1.w)/2)-text->get_text_size("Jugador 2").w-5, 0, std::to_string(puntaje[0]));
-    text->render(((Viewport1.w)/2)-text->get_text_size(std::to_string(puntaje[0])).w-5, 0, std::to_string(puntaje[1]));
-
-    /// abajo ///////////
-    SDL_Rect Viewport;
-    Viewport.h = window->SCREEN_HEIGHT - 90;
-    Viewport.w = window->SCREEN_WIDTH  - 90;
-    Viewport.x = 45;
-    Viewport.y = 80;
-    SDL_RenderSetViewport(text->renderer, &Viewport);
-
-    int x_p=5,y_p=5;
-
-    SDL_Rect rect;
-    rect.h = (Viewport.h/3)-10;
-    rect.w = (Viewport.w/3)-10;
-    rect.x = x_p;
-    rect.y = y_p;
-
-    for(int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-            rect.x = x_p;
-            rect.y = y_p;
-            if(Mark_Tags[i][j] == 1){
-                SDL_SetRenderDrawColor(text->renderer,73,221,238,0xFF);
-                SDL_RenderFillRect(text->renderer,&rect);
-            }
-            if(Mark_Tags[i][j] == 2){
-                SDL_SetRenderDrawColor(text->renderer,12,100,100,0xFF);
-                SDL_RenderFillRect(text->renderer,&rect);
-            }
-            if(Pantalla_C[i][j] == 1){
-                SDL_SetRenderDrawColor(text->renderer,0xFF,0xFF,0xFF,0xFF);
-                SDL_RenderFillRect(text->renderer,&rect);
-                SDL_RenderFillRect(text->renderer,&rect);
-                if(turno==1){
-                    SDL_SetRenderDrawColor(text->renderer,73,221,238,0xFF);
-                }else{
-                    SDL_SetRenderDrawColor(text->renderer,12,100,100,0xFF);
-                }
-            }
-            x_p = x_p + (Viewport.w/3);
-        }
-        x_p = 5;
-        y_p = y_p +(Viewport.h/3);
-    }
-    SDL_SetRenderDrawColor(text->renderer,0xFF,0xFF,0xFF,0xFF);
-
-    SDL_RenderDrawLine(text->renderer,     Viewport.w/3,                0,     Viewport.w/3,       Viewport.h);
-    SDL_RenderDrawLine(text->renderer, 2*(Viewport.w/3),                0, 2*(Viewport.w/3),       Viewport.h);
-    SDL_RenderDrawLine(text->renderer,                0,     Viewport.h/3,       Viewport.w,     Viewport.h/3);
-    SDL_RenderDrawLine(text->renderer,                0, 2*(Viewport.h/3),       Viewport.w, 2*(Viewport.h/3));
-}
-
-
 int main( int argc, char* args[] ){
     int SCREEN_WIDTH  = 640;
     int SCREEN_HEIGHT = 480;
     int FONT_SIZE = 20;
 
-    int Turno = 1;
-    int Pantalla_C[3][3] = {
-        {0, 0, 0},
-        {0, 1, 0},
-        {0, 0, 0}
-    };
-    int Mark_Tags [3][3] = {
+    int turno = 1;
+    int pantalla_c[3][3] = {
         {0, 0, 0},
         {0, 0, 0},
         {0, 0, 0}
     };
-    int Puntaje[2] = {0, 0};
+    int mark_tags [3][3] = {
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0}
+    };
+    int puntaje[2] = {0, 0};
 
     bool exit = false;
 
     std::string PATH_FONT = "asset/font/LiberationMono-Regular.ttf";
     std::string PATH_ICON = "asset/icon.bmp";
 
-    SDL_Point cursor = {0, 0};
-
+    SDL_Point cursor = {1, 1};
+    pantalla_c[cursor.x][cursor.y] = 1;
+    
     SDL_Color COLOR_BLACK = {0x00, 0x00, 0x00, 0xFF};
     SDL_Color COLOR_RED   = {0xFF, 0x00, 0x00, 0xFF};
     SDL_Color COLOR_GREEN = {0x00, 0xFF, 0x00, 0xFF};
     SDL_Color COLOR_BLUE  = {0x00, 0x00, 0xFF, 0xFF};
     SDL_Color COLOR_WHITE = {0xFF, 0xFF, 0xFF, 0xFF};
+
+
+    SDL_Rect Viewport1;
+    Viewport1.h = 80;
+    Viewport1.w = SCREEN_WIDTH;
+    Viewport1.x = 0;
+    Viewport1.y = 0;
+
+    SDL_Rect Viewport;
+    Viewport.h = SCREEN_HEIGHT - 90;
+    Viewport.w = SCREEN_WIDTH  - 90;
+    Viewport.x = 45;
+    Viewport.y = 80;
+
 
     Window window("TIC-TAC-TOE", SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BLACK);
     window.set_icon(PATH_ICON);
@@ -246,48 +177,144 @@ int main( int argc, char* args[] ){
             window.clear_screen();
 
             if(action->check_action(action->BUTTON_MOVE_UP)){
-                Pantalla_C[cursor.y][cursor.x] = 0;
+                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.y = cursor.y - 1;
                 if(cursor.y<0){
                     cursor.y = 2;
                 }
-                Pantalla_C[cursor.y][cursor.x] = 1;
+                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_MOVE_DOWN)){
-                Pantalla_C[cursor.y][cursor.x] = 0;
+                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.y = cursor.y + 1;
                 if(cursor.y>2){
                     cursor.y = 0;
                 }
-                Pantalla_C[cursor.y][cursor.x] = 1;
+                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_MOVE_LEFT)){
-                Pantalla_C[cursor.y][cursor.x] = 0;
+                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.x = cursor.x - 1;
                 if(cursor.x<0){
                     cursor.x = 2;
                 }
-                Pantalla_C[cursor.y][cursor.x] = 1;
+                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_MOVE_RIGHT)){
-                Pantalla_C[cursor.y][cursor.x] = 0;
+                pantalla_c[cursor.y][cursor.x] = 0;
                 cursor.x = cursor.x + 1;
                 if(cursor.x>2){
                     cursor.x = 0;
                 }
-                Pantalla_C[cursor.y][cursor.x] = 1;
+                pantalla_c[cursor.y][cursor.x] = 1;
             }else if(action->check_action(action->BUTTON_ACTION)){
-                if(( Mark_Tags[cursor.y][cursor.x] != 1 ) && ( Mark_Tags[cursor.y][cursor.x] != 2 ) ){
-                    if(Turno == 1){
-                        Mark_Tags[cursor.y][cursor.x]  = 1;
-                    }else if(Turno == -1){
-                        Mark_Tags[cursor.y][cursor.x]  = 2;
+                if(( mark_tags[cursor.y][cursor.x] != 1 ) && ( mark_tags[cursor.y][cursor.x] != 2 ) ){
+                    if(turno == 1){
+                        mark_tags[cursor.y][cursor.x]  = 1;
+                    }else if(turno == -1){
+                        mark_tags[cursor.y][cursor.x]  = 2;
                     }
-                    Turno= Turno*-1;
+                    turno= turno*-1;
                 }
             }
 
-            Impresor_Pantalla(&text_white, &window, Turno, Puntaje, Mark_Tags, Pantalla_C);
 
-            if(Check_C(Puntaje, &Turno, Mark_Tags)){
-                Reset(&Turno, cursor, Pantalla_C, Mark_Tags);
+
+            // Draw
+
+
+            SDL_RenderSetViewport(text_white.renderer, &Viewport1);
+
+            text_white.render(0, 0, "Jugador 1");
+            text_white.render(
+                Viewport1.w-text_white.get_text_size("Jugador 1").w, 0, 
+                "Jugador 2"
+            );
+
+            text_white.render(
+                (Viewport1.w/2) - text_white.get_text_size("Jugador 2").w - 5, 0,
+                std::to_string(puntaje[0])
+            );
+            text_white.render(
+                (Viewport1.w/2) - text_white.get_text_size(std::to_string(puntaje[0])).w - 5, 0,
+                std::to_string(puntaje[1])
+            );
+
+            /// abajo ///////////
+            SDL_RenderSetViewport(text_white.renderer, &Viewport);
+
+            int x_p=5,y_p=5;
+
+            SDL_Rect rect;
+            rect.h = (Viewport.h/3)-10;
+            rect.w = (Viewport.w/3)-10;
+            rect.x = x_p;
+            rect.y = y_p;
+
+            for(int i=0;i<3;i++){
+                for(int j=0;j<3;j++){
+                    rect.x = x_p;
+                    rect.y = y_p;
+                    if(mark_tags[i][j] == 1){
+                        window.draw_rectangle(rect, {73,221,238,0xFF});
+                    }
+                    if(mark_tags[i][j] == 2){
+                        window.draw_rectangle(rect, {12,100,100,0xFF});
+                    }
+                    if(pantalla_c[i][j] == 1){
+                        window.draw_rectangle(rect, COLOR_WHITE);
+                    }
+                    x_p = x_p + (Viewport.w/3);
+                }
+                x_p = 5;
+                y_p = y_p +(Viewport.h/3);
+            }
+
+
+
+            window.draw_line(
+                {Viewport.w/3,          0},
+                {Viewport.w/3, Viewport.h},
+                COLOR_WHITE
+            );
+
+            window.draw_line(
+                {2*(Viewport.w/3),          0},
+                {2*(Viewport.w/3), Viewport.h},
+                COLOR_WHITE
+            );
+
+            window.draw_line(
+                {0,          Viewport.h/3},
+                {Viewport.w, Viewport.h/3},
+                COLOR_WHITE
+            );
+
+            window.draw_line(
+                {0,          2*(Viewport.h/3)},
+                {Viewport.w, 2*(Viewport.h/3)},
+                COLOR_WHITE
+            );
+
+            SDL_RenderSetViewport(text_white.renderer, nullptr);
+
+
+
+
+
+
+            if(Check_C(puntaje, &turno, mark_tags)){
+                for (int i=0;i<3;i++){
+                    for(int j=0;j<3;j++){
+                        pantalla_c[i][j] = 0;
+                    }
+                }
+                for (int i=0;i<3;i++){
+                    for(int j=0;j<3;j++){
+                        mark_tags[i][j] = 0;
+                    }
+                }
+                cursor.x=0;
+                cursor.y=0;
+                pantalla_c[cursor.y][cursor.x] = 1;
+                turno = 1;
             }
             window.update_screen();
         }
