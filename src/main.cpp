@@ -5,115 +5,16 @@
 #include "action.h"
 #include "texture.h"
 
-
-bool check_board(int score[2], int *turno, int mark_tags[3][3]){
-    bool Reseteo = false;
-    /// triqi ? /////
-    int Triqi_h[2]  = {0,0};
-    int Triqi_v[2]  = {0,0};
-    int Triqi_d1[2] = {0,0};
-    int Triqi_d2[2] = {0,0};
-
-    for(int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-           /// horizontal ///////////////
-           if(mark_tags[i][j] == 1){
-                Triqi_h[0]++;
-           }else if(mark_tags[i][j] == 2){
-                Triqi_h[1]++;
-           }
-           /// vertical ///////////////
-           if(mark_tags[j][i] == 1){
-                Triqi_v[0]++;
-           }else if(mark_tags[j][i] == 2){
-                Triqi_v[1]++;
-           }
-           /// diagonal? ///////////////
-           if(i == j){
-                if(mark_tags[i][j] == 1){
-                    Triqi_d1[0]++;
-                }else if(mark_tags[i][j] == 2){
-                    Triqi_d1[1]++;
-                }
-           }
-           if((i+j) == 2){
-                if(mark_tags[i][j] == 1){
-                    Triqi_d2[0]++;
-                }else if(mark_tags[i][j] == 2){
-                    Triqi_d2[1]++;
-                }
-           }
-        }
-        if(Triqi_h[0] == 3){
-            printf("Triqi_h 1\n");
-            score[0]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_h[1] == 3){
-            printf("Triqi_h 2\n");
-            score[1]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_v[0] == 3){
-            printf("Triqi_v 1\n");
-            score[0]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_v[1] == 3){
-            printf("Triqi_v 2\n");
-            score[1]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_d1[0] == 3){
-            printf("Triqi_d1 1\n");
-            score[0]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_d1[1] == 3){
-            printf("Triqi_d1 2\n");
-            score[1]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_d2[0] == 3){
-            printf("Triqi_d2 1\n");
-            score[0]++;
-            Reseteo = true;
-            break;
-        }else if(Triqi_d2[1] == 3){
-            printf("Triqi_d2 2\n");
-            score[1]++;
-            Reseteo = true;
-            break;
-        }else{
-            Triqi_h[0] = 0;
-            Triqi_h[1] = 0;
-            Triqi_v[0] = 0;
-            Triqi_v[1] = 0;
-        }
-    }
-    /// se lleno? /////////////
-    int Zeros = 0;
-    for(int i=0;i<3;i++){
-        for(int j=0;j<3;j++){
-           if(mark_tags[i][j] == 0){
-                Zeros++;
-           }
-        }
-    }
-    if(Zeros == 0){
-        Reseteo = true;
-    }
-
-    return Reseteo;
-}
-
 int main( int argc, char* args[] ){
-    int SCREEN_WIDTH  = 640;
-    int SCREEN_HEIGHT = 480;
+    int SCREEN_WIDTH  = 800;
+    int SCREEN_HEIGHT = 600;
     int FONT_SIZE     =  20;
 
     int turn = 1;
+    int turn_number = 1;
+
     bool exit = false;
+    bool win_condition = false;
 
     int board[3][3] = {
         {0, 0, 0},
@@ -144,19 +45,19 @@ int main( int argc, char* args[] ){
         0, 
         0,
         SCREEN_WIDTH,
-        80
+        FONT_SIZE
     };
 
     SDL_Rect view_board = {
         45, 
-        80,
+        90,
         SCREEN_WIDTH  - 90,
-        SCREEN_HEIGHT - 90
+        SCREEN_HEIGHT - 135
     };
 
     SDL_Rect mark = {
-        5,
-        5,
+        view_board.x + 5,
+        view_board.y + 5,
         (view_board.w/3) - 10,
         (view_board.h/3) - 10
     };
@@ -199,7 +100,8 @@ int main( int argc, char* args[] ){
                     }else if(turn == -1){
                         board[cursor.y][cursor.x]  = 2;
                     }
-                    turn= turn*-1;
+                    turn = turn*-1;
+                    turn_number += 1;
                 }
             }
 
@@ -218,7 +120,6 @@ int main( int argc, char* args[] ){
 
             // Draw
 
-
             text_white.render(0, 0, PLAYER1);
             text_white.render(
                 view_stat.w - text_white.get_text_size(PLAYER1).w, 0, 
@@ -234,11 +135,9 @@ int main( int argc, char* args[] ){
                 std::to_string(score[1])
             );
 
-
-
-            mark.y = 5;
+            mark.y = view_board.y + 5;
             for(int i=0;i<3;i++){
-                mark.x = 5;
+                mark.x = view_board.x + 5;
                 for(int j=0;j<3;j++){
                     if(board[i][j] == 1){
                         window.draw_rectangle(mark, COLOR_P1);
@@ -257,34 +156,120 @@ int main( int argc, char* args[] ){
 
 
             window.draw_line(
-                {view_board.w/3,            0},
-                {view_board.w/3, view_board.h},
+                {
+                    view_board.x + view_board.w/3,
+                    view_board.y
+                },
+                {
+                    view_board.x + view_board.w/3,
+                    view_board.y + view_board.h
+                },
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {2*(view_board.w/3),            0},
-                {2*(view_board.w/3), view_board.h},
+                {
+                    view_board.x + 2*(view_board.w/3),
+                    view_board.y
+                },
+                {
+                    view_board.x + 2*(view_board.w/3),
+                    view_board.y + view_board.h
+                },
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {0,            view_board.h/3},
-                {view_board.w, view_board.h/3},
+                {
+                    view_board.x,
+                    view_board.y + view_board.h/3
+                },
+                {
+                    view_board.x + view_board.w,
+                    view_board.y + view_board.h/3
+                },
                 COLOR_WHITE
             );
 
             window.draw_line(
-                {0,            2*(view_board.h/3)},
-                {view_board.w, 2*(view_board.h/3)},
+                {
+                    view_board.x,
+                    view_board.y + 2*(view_board.h/3)
+                },
+                {
+                    view_board.x + view_board.w,
+                    view_board.y + 2*(view_board.h/3)
+                },
                 COLOR_WHITE
             );
 
             window.set_viewport(nullptr);
 
 
-            // check state
-            if(check_board(score, &turn, board)){
+            // check win condition
+
+            for (int player_id = 1; player_id < 3; ++player_id)
+            {
+                // Horizontal
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (
+                        (board[i][0] == player_id) &&
+                        (board[i][1] == player_id) &&
+                        (board[i][2] == player_id)
+                    ){
+                        score[player_id - 1]++;
+                        win_condition = true;
+                        break;
+                    }
+                }
+                // Vertical
+
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (
+                        (board[0][i] == player_id) &&
+                        (board[1][i] == player_id) &&
+                        (board[2][i] == player_id)
+                    ){
+                        score[player_id - 1]++;
+                        win_condition = true;
+                        break;
+                    }
+                }
+                // Diagonal 1
+
+                if (
+                    (board[0][0] == player_id) &&
+                    (board[1][1] == player_id) &&
+                    (board[2][2] == player_id)
+                ){
+                    score[player_id - 1]++;
+                    win_condition = true;
+                }
+
+                // Diagonal 2
+
+                if (
+                    (board[0][2] == player_id) &&
+                    (board[1][1] == player_id) &&
+                    (board[2][0] == player_id)
+                ){
+                    score[player_id - 1]++;
+                    win_condition = true;
+                }
+
+            }
+
+
+            // reset
+            if (turn_number == 9){
+                win_condition = true;
+            }
+
+
+            if(win_condition){
+                win_condition = false;
                 for (int i=0;i<3;i++){
                     for(int j=0;j<3;j++){
                         board[i][j] = 0;
@@ -293,7 +278,9 @@ int main( int argc, char* args[] ){
                 cursor.x = 0;
                 cursor.y = 0;
                 turn     = 1;
+                turn_number = 1;
             }
+
             window.update_screen();
         }
     }
