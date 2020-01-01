@@ -1,6 +1,4 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h>
 #include <string>
 
 #include "window.h"
@@ -131,6 +129,9 @@ int main( int argc, char* args[] ){
     std::string PATH_FONT = "asset/font/LiberationMono-Regular.ttf";
     std::string PATH_ICON = "asset/icon.bmp";
 
+    std::string PLAYER1 = "Jugador 1";
+    std::string PLAYER2 = "Jugador 2";
+
     SDL_Point cursor = {1, 1};
     pantalla_c[cursor.x][cursor.y] = 1;
     
@@ -139,20 +140,29 @@ int main( int argc, char* args[] ){
     SDL_Color COLOR_GREEN = {0x00, 0xFF, 0x00, 0xFF};
     SDL_Color COLOR_BLUE  = {0x00, 0x00, 0xFF, 0xFF};
     SDL_Color COLOR_WHITE = {0xFF, 0xFF, 0xFF, 0xFF};
+    SDL_Color COLOR_P1    = {  73,  221,  238, 0xFF};
+    SDL_Color COLOR_P2    = {  12,  100,  100, 0xFF};
 
+    SDL_Rect Viewport1 = {
+        0, 
+        0,
+        SCREEN_WIDTH,
+        80
+    };
 
-    SDL_Rect Viewport1;
-    Viewport1.h = 80;
-    Viewport1.w = SCREEN_WIDTH;
-    Viewport1.x = 0;
-    Viewport1.y = 0;
+    SDL_Rect Viewport = {
+        45, 
+        80,
+        SCREEN_WIDTH  - 90,
+        SCREEN_HEIGHT - 90
+    };
 
-    SDL_Rect Viewport;
-    Viewport.h = SCREEN_HEIGHT - 90;
-    Viewport.w = SCREEN_WIDTH  - 90;
-    Viewport.x = 45;
-    Viewport.y = 80;
-
+    SDL_Rect rect = {
+        5,
+        5,
+        (Viewport.w/3) - 10,
+        (Viewport.h/3) - 10
+    };
 
     Window window("TIC-TAC-TOE", SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BLACK);
     window.set_icon(PATH_ICON);
@@ -219,17 +229,16 @@ int main( int argc, char* args[] ){
 
             // Draw
 
+            window.set_viewport(&Viewport1);
 
-            SDL_RenderSetViewport(text_white.renderer, &Viewport1);
-
-            text_white.render(0, 0, "Jugador 1");
+            text_white.render(0, 0, PLAYER1);
             text_white.render(
-                Viewport1.w-text_white.get_text_size("Jugador 1").w, 0, 
-                "Jugador 2"
+                Viewport1.w-text_white.get_text_size(PLAYER1).w, 0, 
+                PLAYER2
             );
 
             text_white.render(
-                (Viewport1.w/2) - text_white.get_text_size("Jugador 2").w - 5, 0,
+                (Viewport1.w/2) - text_white.get_text_size(PLAYER2).w - 5, 0,
                 std::to_string(puntaje[0])
             );
             text_white.render(
@@ -237,21 +246,13 @@ int main( int argc, char* args[] ){
                 std::to_string(puntaje[1])
             );
 
-            /// abajo ///////////
-            SDL_RenderSetViewport(text_white.renderer, &Viewport);
 
-            int x_p=5,y_p=5;
+            window.set_viewport(&Viewport);
 
-            SDL_Rect rect;
-            rect.h = (Viewport.h/3)-10;
-            rect.w = (Viewport.w/3)-10;
-            rect.x = x_p;
-            rect.y = y_p;
-
+            rect.x = 5;
+            rect.y = 5;
             for(int i=0;i<3;i++){
                 for(int j=0;j<3;j++){
-                    rect.x = x_p;
-                    rect.y = y_p;
                     if(mark_tags[i][j] == 1){
                         window.draw_rectangle(rect, {73,221,238,0xFF});
                     }
@@ -261,10 +262,10 @@ int main( int argc, char* args[] ){
                     if(pantalla_c[i][j] == 1){
                         window.draw_rectangle(rect, COLOR_WHITE);
                     }
-                    x_p = x_p + (Viewport.w/3);
+                    rect.x = rect.x + (Viewport.w/3);
                 }
-                x_p = 5;
-                y_p = y_p +(Viewport.h/3);
+                rect.x = 5;
+                rect.y = rect.y + (Viewport.h/3);
             }
 
 
@@ -293,10 +294,7 @@ int main( int argc, char* args[] ){
                 COLOR_WHITE
             );
 
-            SDL_RenderSetViewport(text_white.renderer, nullptr);
-
-
-
+            window.set_viewport(nullptr);
 
 
 

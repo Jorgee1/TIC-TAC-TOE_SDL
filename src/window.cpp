@@ -79,6 +79,9 @@ void Window::set_icon(std::string icon_path){
     }
 }
 
+void Window::set_viewport(SDL_Rect* viewport){
+    SDL_RenderSetViewport(render, viewport);
+}
 
 void Window::draw_line(
         SDL_Point p1,
