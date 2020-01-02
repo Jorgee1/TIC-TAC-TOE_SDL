@@ -1,9 +1,10 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <string>
 
 #include "window.h"
 #include "action.h"
 #include "texture.h"
+
 
 int main( int argc, char* args[] ){
     int SCREEN_WIDTH  = 800;
