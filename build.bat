@@ -12,11 +12,11 @@ set LIBS=SDL2main.lib SDL2.lib SDL2_ttf.lib SDL2_image.lib
 set LIB_PATH=/LIBPATH:%PATH_SDL%\lib\x64 /LIBPATH:%PATH_TTF%\lib\x64 /LIBPATH:%PATH_IMG%\lib\x64
 set INCLUDES=/I. /I.\include /I%PATH_SDL%\include /I%PATH_TTF%\include /I%PATH_IMG%\include
 
-set FLAGS=/EHsc /SUBSYSTEM:WINDOWS
+set FLAGS=/EHsc
 
 mkdir %BUILD_FOLDER%
 
-cl %FLAGS% %CPP_FILES% /Fe%BUILD_FOLDER%\%GAME_NAME% %INCLUDES% %LIBS% /link %LIB_PATH%
+cl %FLAGS% %CPP_FILES% /Fe%BUILD_FOLDER%\%GAME_NAME% %INCLUDES% %LIBS% /link %LIB_PATH% /SUBSYSTEM:WINDOWS
 
 
 
@@ -33,6 +33,6 @@ cd %BUILD_FOLDER%
 cd ..
 cd ..
 
-
+del *.obj
 
 
